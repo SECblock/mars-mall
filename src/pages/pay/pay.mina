@@ -1,0 +1,512 @@
+<config>
+{
+  "navigationBarTitleText": "确认订单",
+  "usingComponents": {
+    "m-yctoast": "components/toast"
+  }
+}
+</config>
+
+<style lang="postcss" scoped>
+.pay-view {
+  .icon-address:after {
+    font-family: 'iconfont';
+    font-weight: 500;
+    font-style: normal;
+    content: '\e69f';
+  }
+  .icon-arrow:after {
+    font-family: 'iconfont';
+    font-weight: 500;
+    font-style: normal;
+    content: '\e6a9';
+  }
+  .icon-wechat:after {
+    font-family: 'iconfont';
+    font-weight: 500;
+    font-style: normal;
+    content: '\e6a1';
+  }
+  .icon-sub:after {
+    font-family: 'iconfont';
+    font-weight: 500;
+    font-style: normal;
+    content: '\e6a4';
+  }
+  .icon-add:after {
+    font-family: 'iconfont';
+    font-weight: 500;
+    font-style: normal;
+    content: '\e6a3';
+  }
+}
+.pay-view {
+  background-color: #f6f6f6;
+  height: 100%;
+  .address {
+    background-color: #ffffff;
+    border-top: 18rpx solid #f6f6f6;
+    border-bottom: 36rpx solid #f6f6f6;
+    .address-show {
+      padding: 0 24rpx;
+      height: 136rpx;
+      .address-icon {
+        width: 56rpx;
+        height: 136rpx;
+        line-height: 136rpx;
+        .icon {
+          font-size: 56rpx;
+          color: #5f527b;
+        }
+        .icon-arrow {
+          margin-right: 8rpx;
+        }
+      }
+      .address-context {
+        width: 582rpx;
+        padding: 22rpx 20rpx;
+        .name-phone {
+          font-size: 30rpx;
+          .name {
+            display: inline-block;
+          }
+          .phone {
+            display: inline-block;
+            color: #9b9b9b;
+            padding-left: 40rpx;
+          }
+        }
+        .context {
+          font-size: 24rpx;
+          color: #9b9b9b;
+          margin-top: 10rpx;
+          overflow: hidden;
+          text-overflow:ellipsis;
+          white-space: nowrap;
+        }
+      }
+    }
+    .address-select {
+      margin: 0 32rpx 0 24rpx;
+      .address-button {
+        height: 88rpx;
+        line-height: 88rpx;
+        .context {
+          font-size: 30rpx;
+          padding: 0 20rpx;
+        }
+        .icon {
+          font-size: 56rpx;
+          color: #5f527b;
+        }
+      }
+      .aura-address {
+        border-bottom: solid 1rpx #e9ecef;
+      }
+    }
+  }
+  .product {
+    background-color: #ffffff;
+    .product-container {
+      margin: 0 32rpx;
+      .product-info {
+        font-size: 30rpx;
+        padding: 20rpx 0;
+        border-bottom:  solid 1px #e9ecef;
+        .image {
+          width: 108rpx;
+          height: 108rpx;
+          image{
+            width: 100%;
+            height: 100%;
+          }
+        }
+        .name {
+          padding: 12rpx 34rpx 0;
+          width: 430rpx;
+          text-overflow: -o-ellipsis-lastline;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+        }
+        .price {
+          text-align: right;
+          padding: 12rpx 0;
+        }
+
+      }
+      .line {
+        font-size: 26rpx;
+        border-bottom:  solid 1px #e9ecef;
+        height: 88rpx;
+        line-height: 88rpx;
+        text:first-child {
+          float: left;
+        }
+        text:last-child {
+          float: right;
+          color: #c54c82;
+        }
+      }
+      .line:last-child {
+        border-bottom: none;
+      }
+      .product-box {
+        margin: 20rpx 0 14rpx 404rpx;
+        .box {
+          border: solid 1.2rpx #9b9b9b;
+          height: 56rpx;
+          line-height: 56rpx;
+          text-align: center;
+          .icon {
+            font-size: 40rpx;
+            color: #c54c82;
+          }
+        }
+        .sub {
+          border-right: none;
+          border-radius: 8.3rpx 0 0 8.3rpx;
+        }
+        .add {
+          border-left: none;
+          border-radius: 0 8.3rpx 8.3rpx 0;
+        }
+        .signal {
+          width: 80rpx;
+        }
+        .count {
+          width: 122rpx;
+        }
+      }
+    }
+  }
+  .bottom-layer {
+    height: 98rpx;
+  }
+  .bottom {
+    position: fixed;
+    bottom: 0;
+    height: 97rpx;
+    width: 100%;
+    background-color: #ffffff;
+    border-top: solid 1rpx #e9ecef;
+    font-size: 34rpx;
+    .money {
+      width: 430rpx;
+      padding: 0 32rpx;
+      .name {
+        line-height: 97rpx;
+        display: inline-block;
+      }
+      .price {
+        color: #c54c82;
+        line-height: 97rpx;
+        display: inline-block;
+      }
+    }
+    .button {
+      width: 320rpx;
+      background-color: #5f527b;
+      color: #ffffff;
+      text-align: center;
+    }
+    .niu {
+      height: 98rpx;
+      line-height: 98rpx;
+    }
+  }
+}
+</style>
+
+<template>
+  <view class="pay-view">
+    <m-yctoast wx:if="{{toastShow}}">{{errMsg}}</m-yctoast>
+    <view class="address">
+      <view wx:if="{{addressIsSelected}}" class="address-show clearfix" bindtap="chooseAddress">
+        <view class="fl address-icon">
+          <view class="icon-address icon"></view>
+        </view>
+        <view class="fl address-context">
+          <view class="name-phone">
+            <view class="name">{{selectedAddress.name}}</view>
+            <view class="phone">{{selectedAddress.phone}}</view>
+          </view>
+          <view class="context">{{selectedAddress.provinceName}}{{selectedAddress.cityName}}{{selectedAddress.countyName || selectedAddress.districtName }}{{selectedAddress.address}}</view>
+        </view>
+        <view class="fl address-icon">
+          <view class="icon-arrow icon"></view>
+        </view>
+      </view>
+      <view wx:else class="address-select">
+        <view class="aura-address clearfix address-button" bindtap="chooseAddress">
+          <text class="fl icon-address icon"></text>
+          <text class="fl context">设置收货地址</text>
+          <text class="fr icon-arrow icon"></text>
+        </view>
+        <view class="wechat-address clearfix address-button" bindtap="getWechatAddress">
+          <text class="fl icon-wechat icon"></text>
+          <text class="fl context">自动同步微信地址</text>
+          <text class="fr icon-arrow icon"></text>
+        </view>
+      </view>
+    </view>
+    <view class="product">
+      <view class="product-container">
+        <view class="product-info">
+          <view class="product-context clearfix">
+            <view class="fl image">
+              <image src="{{product.image}}"></image>
+            </view>
+            <view class="fl name">{{product.masterName}}</view>
+            <view class="fr price">￥{{product.price}}</view>
+          </view>
+          <view class="product-box clearfix">
+            <view class="fl sub box signal" bindtap="sub">
+              <text class="icon-sub icon"></text>
+            </view>
+            <view class="fl count box count">{{count}}</view>
+            <view class="fl add box signal" bindtap="add">
+              <text class="icon-add icon"></text>
+            </view>
+          </view>
+        </view>
+        <view class="price clearfix line">
+          <text>商品金额</text>
+          <text>￥{{totalPrice}}</text>
+        </view>
+        <view class="freight clearfix line">
+          <text>运费</text>
+          <text>￥0</text>
+        </view>
+        <view class="total clearfix line">
+          <text>合计</text>
+          <text>￥{{totalPrice}}</text>
+        </view>
+      </view>
+    </view>
+    <view class="bottom-layer"></view>
+    <view class="bottom clearfix">
+      <view class="fl money niu">
+        <view class="name">需支付：</view>
+        <view class="price">￥{{totalPrice}}</view>
+      </view>
+      <view class="fr button niu" bindtap="pay">去支付</view>
+    </view>
+  </view>
+</template>
+
+<script>
+import store from '../../store'
+import { Page } from '../../libraries/tina.min.js'
+import ProductService from '../../services/product.js'
+import AddressService from '../../services/address.js'
+import MessageService from '../../services/message.js'
+import PayService from '../../services/pay.js'
+import { wxGetWechatAddress, wxRequestPayment } from '../../utils/promise.js'
+import { getThirdId, wxSendMsg } from '../../utils/functions.js'
+import _ from 'underscore'
+import CONSTANT from '../../constant'
+Page.define({
+  mixins: [store.connect({
+    getters (getters) {
+      return {
+        selectedAddress: getters.selectedAddress(),
+        isWechat: getters.isWechat()
+      }
+    },
+    actions ({ getAddressDefault, setWechatAddress }) {
+      return {
+        getAddressDefault,
+        setWechatAddress,
+      }
+    },
+  })],
+  data: {
+    count: 1,
+    product: {},
+    toastShow: false,
+    errMsg: ""
+  },
+  compute({product, count, selectedAddress}) {
+    return {
+      totalPrice: ((product.price || 0) * count).toFixed(2),
+      addressIsSelected: !_.isEmpty(selectedAddress)
+    }
+  },
+  onLoad() {
+    this.getProductDetail()
+    this.getAddressDefault()
+  },
+  onPullDownRefresh() {
+    this.getProductDetail()
+    // this.getAddressDefault()
+  },
+  methods: {
+    getWechatAddress() {
+      wxGetWechatAddress().then(res=>{
+        this.setWechatAddress(res)
+      })
+    },
+    getProductDetail(){
+      wx.showLoading({
+        title: '正在加载中'
+      })
+      ProductService.getProductDetail(this.$route.query.productId).then((res)=>{
+        // this.setData({
+        //   detail: res
+        // })
+        wx.stopPullDownRefresh()
+        wx.hideLoading()
+        this.getSku(res)
+      }, e =>{
+        wx.hideLoading()
+        this.showErrToast(e.message)
+      })
+    },
+    getSku(res) {
+      const sku = _.find(res.skuList, v=>{
+        return v.id === res.defaultSkuId
+      })
+      res.image = _.first(sku.images || [])
+      res.price = ((sku.price || 0) / 100 ).toFixed(2)
+      res.availableInventory = sku.availableInventory || 0
+      res.skuId = sku.id
+      this.setData({
+        product: res
+      })
+    },
+    sub() {
+      if(this.data.count <= 1){
+        return false
+      }
+      this.setData({
+        count: this.data.count - 1
+      })
+    },
+    add() {
+      if(this.data.count >= this.data.product.availableInventory){
+        return false
+      }
+      this.setData({
+        count: this.data.count + 1
+      })
+    },
+    chooseAddress() {
+      if(this.data.isWechat) {
+        return this.getWechatAddress()
+      }
+      this.$router.navigate(`/pages/address/list`)
+    },
+    addAddress() {
+      this.$router.navigate(`/pages/address/edit?new=1`)
+    },
+    pay() {
+      const { product, count, selectedAddress, isWechat  } = this.data      
+      if(_.isEmpty(selectedAddress)) {
+        return this.showErrToast("请选择地址")
+      }
+      wx.showLoading({
+          title: '下单中'
+      })
+      let deliver = {}
+      console.log("selectedAddress--", selectedAddress)
+      deliver = {
+        name: selectedAddress.name,
+        countryId: 86,  //Y,  uint32
+        provinceId: 440000,  //Y, uint32
+        cityId: 440300,  //Y uint32
+        districtId: 440301,  //Y uint32
+        address: `${selectedAddress.provinceName}${selectedAddress.cityName}${ selectedAddress.countyName || selectedAddress.districtName}${selectedAddress.address}`,  //Y string
+        postCode: "518000" ,  //Y string
+        phone: selectedAddress.phone,  //Y string
+      }
+      const obj = {
+        isFromCart: 0,
+        delivery: deliver,
+        skuList: [{
+          skuId: product.skuId,
+          skuCount: count,
+          price: parseInt((product.price * 100).toFixed(0)),
+          score: 0
+        }],
+        externalPayAmount: parseInt((product.price * count * 100).toFixed(0))
+      }
+      console.log("pay options----", obj)
+      PayService.checkout(obj).then(data=> {
+        console.log(data)
+        this.wechatPay(data, obj)
+      }, e=> {
+        this.showErrToast(e.message)
+        wx.hideLoading()
+      })
+    },
+    wechatPay(order, options) {
+      const { product } = this.data
+      const obj = {
+        payType: 20,
+        payOrderId: order.payOrderId,
+        payAmount: order.payAmount,
+        productName: product.masterName,
+        clientIp: "127.0.0.1",
+        openId: getThirdId(),
+      }
+      PayService.pay(obj).then(data => {
+        console.log(data)
+        wx.hideLoading()
+        this.wxPayment(data, obj, order)
+      }, e=> {
+        this.showErrToast(e.message)
+        wx.hideLoading()
+      })
+    },
+    wxPayment(options, obj, order){
+      const { product, selectedAddress  } = this.data
+      let msg = {
+        prepayId: options.package.split("=")[1],
+        orderId: order.payOrderId,
+        payAmount: order.payAmount,
+        timeStamp: options.timeStamp,
+        address: `${selectedAddress.provinceName}${selectedAddress.cityName}${selectedAddress.districtName}${selectedAddress.address}`,
+        name: product.masterName,
+        typeId: "",
+      }
+      wxRequestPayment(options).then(()=> {
+        console.log("success---")
+        this.sendMessage(msg, 'success')
+        this.$router.navigate(`/pages/callback/callback?orderId=${obj.payOrderId}`)
+      }, e=> {
+        console.log("eeee---", e.message)
+        this.sendMessage(msg, 'cancel')
+        this.$router.navigate(`/pages/order/detail?orderId=${obj.payOrderId}`)
+      })
+    },
+    sendMessage(msg, type) {
+      if(type == 'success') {
+        msg.typeId = CONSTANT['MESSAGE_TEMPLATE_PAY_ID']
+      } else {
+        msg.typeId = CONSTANT['MESSAGE_TEMPLATE_NOPAY_ID']
+      }
+      MessageService.getAccessToken().then(token => {
+        setTimeout(() => {
+          MessageService.sendMessage(token, msg, type)
+        }, 5000);
+      })
+    },
+    showErrToast(msg) {
+      this.setData({
+        errMsg: msg,
+        toastShow: true
+      })
+      setTimeout(() => {
+        this.setData({
+          errMsg: "",
+          toastShow: false
+        })
+      }, 1500);
+    }
+  }
+})
+
+</script>

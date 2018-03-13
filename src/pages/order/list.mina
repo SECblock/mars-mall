@@ -1,0 +1,395 @@
+<config>
+{
+  "navigationBarTitleText": "我的订单",
+  "usingComponents": {
+    "m-yctoast": "components/toast"
+  }
+}
+</config>
+
+<style lang="postcss" scoped>
+.order-list-view {
+  background-color: #f6f6f6;
+  min-height: 100%;
+  .navigator {
+    height: 110rpx;
+    background-color: #5f527b;
+    .tab {
+      width: 123.5rpx;
+      text-align: center;
+      opacity: 0.5;
+      font-size: 30rpx;
+      color: #ffffff;
+      height: 110rpx;
+      line-height: 110rpx;
+      margin: 0 32rpx;
+    }
+    .select {
+      opacity: 1;
+      box-shadow: 0 -8rpx #ffffff inset;
+    }
+  }
+  .order-list {
+    padding: 28rpx;
+    .item {
+      background-color: #ffffff;
+      border-radius: 8rpx;
+      padding: 0 24rpx 20rpx;
+      font-size: 26rpx;
+      margin-bottom: 28rpx;
+      .status {
+        height: 72rpx;
+        line-height: 72rpx;
+        text {
+          color: #c54c82;
+        }
+      }
+      .product {
+        border-top: solid 1px #e9ecef;
+        border-bottom: solid 1px #e9ecef;
+        padding: 16rpx 0;
+        .pic {
+          width: 92rpx;
+          height: 92rpx;
+          image {
+            width: 92rpx;
+            height: 92rpx;
+          }
+        }
+        .name {
+          margin-left: 24rpx;
+          width: 400rpx;
+          margin-top: 4rpx;
+          text-overflow: -o-ellipsis-lastline;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+        }
+        .price-count {
+          margin-top: 4rpx;
+          text-align: right;
+          .price {
+            color: #c54c82;
+          }
+          .count {
+            margin-top: 11rpx;
+            color: #9b9b9b;
+            font-size: 22rpx;
+          }
+        }
+      }
+      .total-price {
+        margin-top: 12rpx;
+        text-align: right;
+        height: 37rpx;
+        line-height: 37rpx;
+        font-size: 22rpx;
+        text{
+          font-size: 26rpx;
+          color: #c54c82;
+        }
+      }
+      .button {
+        margin-top: 15rpx;
+        text-align: right;
+        text {
+          display: inline-block;
+          background-color: #5f527b;
+          color: #fff;
+          width: 160rpx;
+          height: 56rpx;
+          line-height: 56rpx;
+          text-align: center;
+          border-radius: 8rpx;
+        }
+      }
+      .dark {
+        text {
+          display: inline-block;
+          background-color: #ffffff;
+          color: #5f527b;
+          width: 160rpx;
+          height: 56rpx;
+          line-height: 54rpx;
+          text-align: center;
+          border-radius: 8rpx;
+          border: solid 1rpx #5f527b;
+        }
+      }
+    }
+    .loading{
+      height: 144rpx;
+      text-align: center;
+      background-color: #f6f6f6;
+      .image{
+        margin-top:20rpx;
+        width: 64rpx;
+        height: 64rpx;
+      }
+      .context{
+        font-size: 17rpx;
+      }
+    }
+  }
+}
+</style>
+
+<template>
+  <view class="order-list-view">
+    <m-yctoast wx:if="{{toastShow}}">{{errMsg}}</m-yctoast>
+    <view class="navigator clearfix">
+      <view class="tab fl {{type === 9999 ? 'select' : ''}}" bindtap="tab" data-type="9999">全部订单</view>
+      <view class="tab fl {{type === 2 ? 'select' : ''}}" bindtap="tab" data-type="2">待付款</view>
+      <view class="tab fl {{type === 10 ? 'select' : ''}}" bindtap="tab" data-type="10">待发货</view>
+      <view class="tab fl {{type === 6 ? 'select' : ''}}" bindtap="tab" data-type="6">待收货</view>
+    </view>
+    <view class="order-list" >
+      <view wx:for="{{list}}" wx:key="{{index}}" wx:for-item="v" class="item box" >
+        <view class="status" bindtap="navigate" data-id="{{v.orderId}}">
+          <text wx:if="{{v.orderStatus == 0}}">待支付</text>
+          <text wx:elif="{{v.orderStatus == 1}}">已支付</text>
+          <text wx:elif="{{v.orderStatus == 3}}">已取消</text>
+          <text wx:elif="{{v.orderStatus == 8}}">待发货</text>
+          <text wx:elif="{{v.orderStatus == 4 || v.orderStatus == 11}}">待收货</text>
+          <text wx:elif="{{v.orderStatus == 13}}">已完成</text>
+        </view>
+        <view class="product clearfix" bindtap="navigate" data-id="{{v.orderId}}">
+          <view class="pic fl"><image src="{{v.skuList[0].image}}" mode="widthFix"></image></view>
+          <view class="name fl">{{v.sku.productName}}</view>
+          <view class="price-count fr">
+            <view class="price">￥{{v.sku.stringPrice}}</view>
+            <view class="count">x {{v.count}}</view>
+          </view>
+        </view>
+        <view class="total-price" bindtap="navigate" data-id="{{v.orderId}}">{{v.orderStatus == 0 || v.orderStatus == 3 ? '需支付：' : '实付：'}}<text>￥{{v.strTotalPrice}}</text></view>
+        <view class="button" wx:if="{{v.orderStatus == 0}}"><text bindtap="pay" data-index="{{index}}">支付</text></view>
+        <view class="button dark" wx:elif="{{v.orderStatus == 8}}"><text bindtap="push" data-index="{{index}}">催促发货</text></view>
+        <view class="button dark" wx:elif="{{v.orderStatus == 11 || v.orderStatus == 4 }}"><text bindtap="check" data-index="{{index}}">查看物流</text></view>
+      </view>
+      <view wx:if="{{isFetching}}" class="loading">
+        <image src="../../images/loading.gif" class="image"></image>
+        <view class="context">正在加载中</view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script>
+import _ from 'underscore'
+import { Page } from '../../libraries/tina.min.js'
+import OrderService from '../../services/order'
+import PayService from '../../services/pay'
+import { wxRequestPayment } from '../../utils/promise.js'
+import { getThirdId } from '../../utils/functions.js'
+import MessageService from '../../services/message'
+import CONSTANT from '../../constant'
+//index.js
+//获取应用实例
+
+Page.define({
+  data: {
+    count: 0,
+    pageSize: 4,
+    pageNumber: 1,
+    sortKey: 1,
+    sortType: 1,
+    type: 1,
+    list: [],
+    total: 0,
+    isFetching: false,
+    toastShow: false,
+    errMsg: ""
+  },
+  onLoad() {
+    const type = parseInt(this.$route.query.type)
+    this.setData({
+      type: type
+    })
+    this.getList()
+  },
+  onPullDownRefresh() {
+    this.setData({
+      pageNumber: 1
+    }, ()=> {
+      this.getList()
+    })
+  },
+  onReachBottom() {
+    if(this.data.isFetching){
+      return false
+    }
+    if(this.data.total <= this.data.list.length) {
+      return false
+    }
+    const { pageSize, pageNumber, sortKey, sortType, type } = this.data
+    const options = { pageSize, sortKey, sortType, type, pageNumber: pageNumber + 1 }
+    this.setData({
+      isFetching: true
+    })
+    OrderService.getOrderList(options).then(data => {
+      this.setData({
+        pageNumber: this.data.pageNumber + 1,
+        isFetching: false
+      })
+      this.concat(data)
+    }, e => {
+      this.setData({
+        isFetching: false
+      })
+      this.showErrToast(e.message)
+    })
+  },
+  methods: {
+    getList() {
+      const { pageSize, pageNumber, sortKey, sortType, type } = this.data
+      const options = { pageSize, pageNumber, sortKey, sortType, type }
+      OrderService.getOrderList(options).then(data=> {
+        console.log(data)
+        // this.setData({
+        //   list: data.list,
+        //   total: data.total
+        // })
+        this.calc(data)
+      })
+    },
+    calc(data) {
+      _.each(data.list, v=> {
+        const sku = v.skuList[0]
+        sku.stringPrice = (sku.price / 100).toFixed(2)
+        v.sku = sku
+        v.count = (v.totalPrice / v.sku.price).toFixed(0)
+        v.strTotalPrice = (v.totalPrice / 100).toFixed(2)
+      })
+      this.setData({
+        list: data.list,
+        total: data.total
+      })
+      wx.stopPullDownRefresh()
+    },
+    concat(data) {
+      _.each(data.list, v=> {
+        const sku = v.skuList[0]
+        sku.stringPrice = (sku.price / 100).toFixed(2)
+        v.sku = sku
+        v.count = (v.totalPrice / v.sku.price).toFixed(0)
+        v.strTotalPrice = (v.totalPrice / 100).toFixed(2)
+      })
+      this.setData({
+        list: this.data.list.concat(data.list),
+        total: data.total
+      })
+    },
+    tab(e) {
+      const type = parseInt(e.currentTarget.dataset.type)
+      this.setData({
+        type: type,
+        pageNumber: 1,
+        total: 0,
+      })
+      this.getList()
+    },
+    navigate(e) {
+      const id = e.currentTarget.dataset.id
+      this.$router.navigate(`/pages/order/detail?orderId=${id}`)
+    },
+    pay(e) {
+      const index = e.currentTarget.dataset.index
+      wx.showLoading({
+        title: '唤起支付中'
+      })
+      const res = this.data.list[index]
+      console.log("4444", res)
+      const obj = {
+        payType: 20,
+        payOrderId: res.orderId,
+        payAmount: res.externalPayAmount,
+        productName: res.sku.productName,
+        clientIp: "127.0.0.1",
+        openId: getThirdId(),
+      }
+      PayService.pay(obj).then(data => {
+        wx.hideLoading()
+        this.wxPayment(data, obj)
+      }, e=> {
+        this.showErrToast(e.message)
+        wx.hideLoading()
+      })
+    },
+    wxPayment(options, obj){
+      wxRequestPayment(options).then(()=> {
+        console.log("success---")
+        this.sendMsg({package: options.package, payOrderId: obj.payOrderId})
+        this.$router.navigate(`/pages/callback/callback?orderId=${obj.payOrderId}`)
+      }, e=> {
+        console.log("eeee---", e)
+        this.$router.navigate(`/pages/order/detail?orderId=${obj.payOrderId}`)
+      })
+    },
+    push(e) {
+      const index = e.currentTarget.dataset.index
+      const res = this.data.list[index]
+      OrderService.notify(res.orderId).then(()=> {
+        this.showErrToast('催促发货成功')
+      }, e=> {
+        this.showErrToast(e.message)
+      })
+    },
+    check(e) {
+      const index = e.currentTarget.dataset.index
+      const res = this.data.list[index]
+      this.$router.navigate(`/pages/order/express?orderId=${res.orderId}`)
+    },
+    sendMsg(options) {
+      const p1 = new Promise((resolve, reject)=> {
+        OrderService.getOrderDetail(options.orderId).then((data)=> {
+          return resolve(data)
+        }, e=> {
+          return reject(e)
+        })
+      })
+
+      const p2 = new Promise((resolve, reject)=> {
+        MessageService.getAccessToken().then((token)=> {
+          return resolve(token)
+        }, e=> {
+          return reject(e)
+        })
+      })
+
+      Promise.all([p1, p2]).then(function (result) {
+          console.log(result); // ["Hello", "World"]
+          const order = result[0]
+          const token = result[1]
+          const sku = order.skuList[0] || {}
+          let msg = {
+            prepayId: options.package.split("=")[1],
+            orderId: options.payOrderId,
+            payAmount: order.externalPayAmount,
+            timeStamp: ((+new Date()) / 1000).toFixed(0),
+            address: order.address,
+            name: sku.masterName,
+            typeId: CONSTANT['MESSAGE_TEMPLATE_PAY_ID'],
+          }
+          setTimeout(() => {
+            MessageService.sendMessage(token, msg, 'success')
+          }, 5000);
+      })
+    },
+    showErrToast(msg) {
+      this.setData({
+        errMsg: msg,
+        toastShow: true
+      })
+      setTimeout(() => {
+        this.setData({
+          errMsg: "",
+          toastShow: false
+        })
+      }, 1500);
+    }
+  }
+})
+
+</script>

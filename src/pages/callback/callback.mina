@@ -1,0 +1,179 @@
+<config>
+{
+  "navigationBarTitleText": "支付成功"
+}
+</config>
+
+<style lang="postcss" scoped>
+.callback-view {
+  background-color: #f6f6f6;
+  height: 100%;
+  .icon-address:after {
+    font-family: 'iconfont';
+    font-weight: 500;
+    font-style: normal;
+    content: '\e69f';
+  }
+  .container {
+    background: #ffffff;
+    border-top: 18rpx solid #f6f6f6;
+    padding: 0 32rpx;
+    .big-icon-view {
+      padding: 40rpx 0 70rpx;
+      border-bottom: solid 1px #e9ecef;
+      text-align: center;
+      image {
+        width: 200rpx;
+      }
+    }
+    .address {
+      height: 132rpx;
+      border-bottom: solid 1px #e9ecef;
+      .address-icon {
+        width: 56rpx;
+        height: 132rpx;
+        line-height: 132rpx;
+        .icon {
+          font-size: 56rpx;
+          color: #5f527b;
+        }
+        .icon-arrow {
+          margin-right: 8rpx;
+        }
+      }
+      .address-context {
+        width: 582rpx;
+        padding: 18rpx 20rpx;
+        .name-phone {
+          font-size: 30rpx;
+          .name {
+            display: inline-block;
+          }
+          .phone {
+            display: inline-block;
+            color: #9b9b9b;
+            padding-left: 40rpx;
+          }
+        }
+        .context {
+          font-size: 24rpx;
+          color: #9b9b9b;
+          margin-top: 10rpx;
+          overflow: hidden;
+          text-overflow:ellipsis;
+          white-space: nowrap;
+        }
+      }
+    }
+    .price {
+      height: 84rpx;
+      line-height: 84rpx;
+      border-bottom: solid 1px #e9ecef;
+      font-size: 26rpx;
+      text.number {
+        color: #c54c82;
+        display: inline-block;
+        margin-left: 16rpx;
+      }
+    }
+    .button-view {
+      height: 160rpx;
+      padding: 40rpx 0rpx;
+      .button {
+        width: 324rpx;
+        height: 80rpx;
+        line-height: 80rpx;
+        font-size: 34rpx;
+        text-align: center;
+      }
+      .detail {
+        border-radius: 9.4rpx;
+        border: solid 1rpx #5f527b;
+        color: #5f527b;
+      }
+      .share {
+        background-color: #5f527b;
+        color: #ffffff;
+        border-radius: 9.4rpx;
+        border: solid 1rpx #5f527b;
+      }
+    }
+  }
+}
+</style>
+
+<template>
+  <view class="callback-view">
+    <view class="container">
+      <view class="big-icon-view">
+        <view>
+          <image src="../../images/success.png" mode="widthFix"></image>
+        </view>
+        <view class="context">支付成功</view>
+      </view>
+      <view class="address clearfix">
+        <view class="fl address-icon">
+          <view class="icon-address icon"></view>
+        </view>
+        <view class="fl address-context">
+          <view class="name-phone">
+            <view class="name">{{detail.name}}</view>
+            <view class="phone">{{detail.phone}}</view>
+          </view>
+          <view class="context">{{detail.address}}</view>
+        </view>
+      </view>
+      <view class="price"><text>实付：</text><text class="number">￥{{detail.strTotalPrice}}</text></view>
+      <view class="button-view clearfix">
+        <button class="fl button detail" bindtap="detail">查看订单详情</button>
+        <button class="fr button share" open-type="share">分享给好友</button>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script>
+import { Page } from '../../libraries/tina.min.js'
+import OrderService from '../../services/order'
+
+Page.define({
+  data: {
+    count: 0,
+    detail: {},
+    sku: {},
+  },
+  onLoad() {
+    OrderService.getOrderDetail(this.$route.query.orderId).then(data => {
+      console.log("callback----", data)
+      data.strTotalPrice = (data.totalPrice / 100).toFixed(2)
+      this.setData({
+        detail: data,
+        sku: data.skuList[0]
+      })
+      wx.stopPullDownRefresh()
+    })
+  },
+  onPullDownRefresh() {
+    this.onLoad()
+  },
+  onShareAppMessage() {
+    return {
+      title: `${this.data.sku.productName || ""}`,
+      path: `/pages/product/product?productId=${this.data.sku.productId}`,
+      imageUrl: `${this.data.sku.image || ""}`,
+      success: function(res) {
+        // 转发成功
+      },
+      fail: function(res) {
+        // 转发失败
+      }
+    }
+  },
+  methods: {
+    detail() {
+      this.$router.navigate(`/pages/order/detail?orderId=${this.$route.query.orderId}`)
+    },
+  }
+})
+
+</script>

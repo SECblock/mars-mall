@@ -1,0 +1,378 @@
+<config>
+{
+  "navigationBarTitleText": "新增收货地址"
+}
+</config>
+
+<style lang="postcss" scoped>
+.address-edit-view {
+  height: 100%;
+  background-color: #f6f6f6;
+  .form-container {
+    background-color: #ffffff;
+    margin-top: 18rpx;
+    padding: 0 32rpx;
+    .line {
+      font-size: 30rpx;
+      height: 88rpx;
+      line-height: 88rpx;
+      border-bottom: solid 1px #e9ecef;
+      input {
+        height: 88rpx;
+        line-height: 88rpx;
+      }
+      text {
+        color: #9b9b9b;
+      }
+      .input-text {
+        color: #9b9b9b;
+        font-size: 30rpx;
+      }
+    }
+    .line:last-child {
+      border-bottom: none;
+    }
+  }
+  .default {
+    margin-top: 32rpx;
+    height: 88rpx;
+    font-size: 30rpx;
+    line-height: 88rpx;
+    padding: 0 32rpx;
+    background-color: #ffffff;
+    .context {
+      float: left;
+    }
+    .switch {
+      float: right;
+    }
+  }
+  .confirm {
+    background: #5f527b;
+    color: #ffffff;
+    font-size: 34rpx;
+    height: 88rpx;
+    line-height: 88rpx;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    border-radius: 0;
+  }
+  .error-msg {
+    width: 100%;
+    text-align: center;
+    font-size: 30rpx;
+    background-color: #e64340;
+    color: #ffffff;
+    transition: height 1s ease;
+    line-height: 88rpx;
+  }
+  .error-hide {
+    height: 0;
+  }
+  .error-show {
+    height: 88rpx;
+  }
+}
+</style>
+
+<template>
+<view class="address-edit-view">
+  <view class="error-msg {{errShow ? 'error-show': 'error-hide'}}" >{{errMsg}}</view>
+  <form bindsubmit="formSubmit" class="address-form">
+    <view class="form-container">
+      <view class="line">
+        <input type="text" placeholder="姓名" value="{{name}}" placeholder-class="input-text" name="name"/>
+      </view>
+      <view class="line">
+        <input type="number" placeholder="手机号码" value="{{phone}}" placeholder-class="input-text" name="phone" maxlength="11"/>
+      </view>
+      <view class="line" >
+        <picker mode="multiSelector" value="{{region}}" range="{{range}}" range-key="name" bindcolumnchange="handleChange">
+          <view class="picker" wx:if="{{isChange}}">
+            {{provinceName}}{{cityName}}{{districtName}}
+          </view>
+          <view class="picker-context" wx:else>
+            <text>省份、城市、县区</text>
+          </view>
+        </picker>
+      </view>
+      <view class="line">
+        <input type="text" placeholder="详细地址,如街道、楼牌号等" value="{{address}}" placeholder-class="input-text" name="address"/>
+      </view>
+    </view>
+    <view class="default">
+      <view class="context">设置为默认地址</view>
+      <view class="switch">
+        <switch checked="{{isDefault}}" bindchange="switchChange" color="#5f527b"/>
+      </view>
+    </view>
+    <button class="confirm" formType="submit">确定</button>
+  </form>
+</view>
+
+</template>
+
+<script>
+import { Page } from '../../libraries/tina.min.js'
+import store from '../../store'
+import _ from 'underscore'
+//index.js
+//获取应用实例
+
+Page.define({
+  mixins: [store.connect({
+    getters (getters) {
+      return {
+        province: getters.province(),
+        city: getters.city(),
+        district: getters.district()
+      }
+    },
+    actions ({ saveAddress, editAddress, editAddressDefault, getAddressById, getProvince, getCity, getdistrict }) {
+      return {
+        saveAddress,
+        editAddress,
+        editAddressDefault,
+        getAddressById,
+        getProvince,
+        getCity,
+        getdistrict
+      }
+    },
+  })],
+  data: {
+    count: 0,
+    name: "",
+    phone: "",
+    address: "",
+    region: [0, 0, 0],
+    range: [[],[],[]],
+    customItem: '全部',
+    provinceList: [],
+    cityList: [],
+    districtList: [],
+    isChange: false,
+    isEdit: false,
+    isDefault: false,
+    errShow: false,
+    errMsg: "6666"
+  },
+  compute ({provinceList, cityList, districtList, region}) {
+    return {
+      provinceName: _.isEmpty(provinceList) ? "" : (region[0] != 0 ? provinceList[region[0]].name || "" : ""),
+      cityName: _.isEmpty(cityList) ? "" : (region[1] != 0 ? cityList[region[1]].name || "" : ""),
+      districtName: _.isEmpty(districtList) ? "" : (region[2] != 0 ? districtList[region[2]].name || "" : ""),
+    }
+  },
+  onLoad() {
+    console.log("rote---", this.$route)
+    const isEdit = !!this.$route.query.addressId
+    this.setData({
+      isChange: !!this.$route.query.addressId,
+      isEdit: isEdit,
+      isDefault: !!this.$route.query.new
+    })
+    if(isEdit) {
+      const id = parseInt(this.$route.query.addressId) || 0
+      this.getAddressById(id).then(data=> {
+        this.setData({
+          name: data.name,
+          phone: data.phone,
+          address: data.address,
+          isDefault: !!data.isDefault,
+          isChange: true
+        })
+        wx.stopPullDownRefresh()
+        this.setRegion(data)
+      })
+    } else {
+      this.getProvinceById()
+    }
+  },
+  onPullDownRefresh() {
+    this.onLoad()
+    // wx.stopPullDownRefresh()
+  },
+  methods: {
+    setRegion(res) {
+      console.log(res)
+      const self = this
+      const p1 = new Promise((resolve, reject) => {
+        this.getProvince().then(data => {
+          let list = [{id: 0, name: "请选择"}]
+          list = list.concat(data)
+          const array = _.pluck(list, 'id')
+          const index = _.indexOf(array, res.provinceId)
+          return resolve({ index, list })
+        })
+      })
+
+      const p2 = new Promise((resolve, reject) => {
+        this.getCity(res.provinceId).then(data => {
+          let list = [{id: 0, name: "请选择"}]
+          list = list.concat(data)
+          const array = _.pluck(list, 'id')
+          const index = _.indexOf(array, res.cityId)
+          return resolve({ index, list })
+        })
+      })
+
+      const p3 = new Promise((resolve, reject) => {
+        this.getdistrict(res.cityId).then(data => {
+          let list = [{id: 0, name: "请选择"}]
+          list = list.concat(data)
+          const array = _.pluck(list, 'id')
+          const index = _.indexOf(array, res.districtId)
+          return resolve({ index, list })
+        })
+      })
+      Promise.all([p1, p2, p3]).then(function (result) {
+          console.log(result); // ["Hello", "World"]
+          self.setData({
+            region: [result[0].index, result[1].index, result[2].index],
+            range: [result[0].list, result[1].list, result[2].list],
+            provinceList: result[0].list,
+            cityList: result[1].list,
+            districtList: result[2].list,
+          })
+      })
+    },
+    getProvinceById() {
+      this.getProvince().then(data=> {
+        const firstProvince = data[0].id
+        this.getCityById(firstProvince)
+        const list = [{id: 0, name: "请选择"}]
+        this.setData({
+          provinceList: list.concat(data)
+        })
+      })
+    },
+    getCityById(id) {
+      if(id === 0) {
+        return 
+      }
+      this.getCity(id).then(data => {
+        console.log("city---", data)
+        const firstCity = data[0].id
+        this.getDistrictById(firstCity)
+        const list = [{id: 0, name: "请选择"}]
+        this.setData({
+          cityList: list.concat(data),
+        })
+      })
+    },
+    getDistrictById(id) {
+      if(id === 0) {
+        return 
+      }
+      this.getdistrict(id).then(data => {
+        console.log("districe----", data)
+        const list = [{id: 0, name: "请选择"}]        
+        this.setData({
+          districtList: list.concat(data),
+          range: [this.data.provinceList, this.data.cityList, list.concat(data)],
+        })
+      })
+    },
+    handleChange(e) {
+      console.log("change----",e)
+      if(!this.data.isChange) {
+        this.setData({
+          isChange: true
+        })
+      }
+      const { column, value } = e.detail
+      let newRegion = this.data.region
+      
+      if (column === 0) {
+        newRegion = [value, 0 , 0]
+        this.getCityById(this.data.provinceList[value].id)
+      } else if ( column === 1) {
+        let [first, ...rest] = this.data.region
+        rest = [value, 0]
+        newRegion = [first, ...rest]
+        this.getDistrictById(this.data.cityList[value].id)
+      } else if ( column === 2) {
+        newRegion[2] = value
+      }
+      console.log("region---", newRegion)
+      this.setData({
+        region: newRegion
+      })
+    },
+    switchChange(e) {
+      this.setData({
+        isDefault: e.detail.value
+      })
+    },
+    showErrorMsg(msg) {
+      const self = this
+      this.setData({
+        errMsg: msg,
+        errShow: true
+      })
+      setTimeout(() => {
+        self.setData({
+          errShow: false
+        })
+      }, 1500);
+    },
+    formSubmit(e) {
+      const newRegion = this.data.region
+      const { value } = e.detail
+      const { isDefault, provinceList, cityList, region ,districtList, isEdit} = this.data
+      let options = {
+        name: value.name || "",
+        phone: value.phone || "",
+        address: value.address || "",
+        isDefault: isDefault ? 1 : 0,
+        provinceId: provinceList[region[0]].id || 0,
+        provinceName: provinceList[region[0]].name || "",
+        cityId: cityList[region[1]].id || 0,
+        cityName: cityList[region[1]].name || "",
+        districtId: districtList[region[2]].id || 0,
+        districtName: districtList[region[2]].name || "",
+        postCode: "518000",
+        countryId: 86,
+      }
+      console.log("options~~~~", options)
+      if(_.isEmpty(options.name)){
+        return this.showErrorMsg("请填写姓名")
+      }
+      if(_.isEmpty(options.phone) || options.phone.length != 11){
+        return this.showErrorMsg("请填写正确的手机号码")
+      }
+      if(_.isEmpty(options.address)){
+        return this.showErrorMsg("请填写完整的详细地址")
+      }
+      if(options.provinceId === 0 || options.cityId === 0 || options.districtId === 0){
+        return this.showErrorMsg("请选择完整的省市区")
+      }
+
+
+      if(isEdit){
+        console.log("77777")
+        options.id = parseInt(this.$route.query.addressId) || 0
+        console.log("edit---", options)
+        this.editAddress(options).then(()=> {
+          console.log(66666)
+          if(options.isDefault) {
+            this.editAddressDefault(options.id)
+          }
+          wx.navigateBack()
+        })
+      } else {
+        this.saveAddress(options).then((data)=> {
+          if(options.isDefault) {
+            this.editAddressDefault(data.addressId)
+          }
+          wx.navigateBack()
+        })
+      }
+    }
+  }
+})
+
+</script>
+ 

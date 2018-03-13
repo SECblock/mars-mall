@@ -1,0 +1,38 @@
+<config>
+{
+  "component": true
+}
+</config>
+
+<style lang="postcss" scoped>
+.wx-toast {
+  position: fixed;
+  z-index: 5000;
+  min-width: 280rpx;
+  min-height: 96rpx;
+  line-height: 96rpx;
+  top: 180px;
+  left: 50%;
+  margin-left: -172rpx;
+  background: rgba(17, 17, 17, 0.7);
+  text-align: center;
+  border-radius: 5px;
+  color: #FFFFFF;
+  font-size: 30rpx;
+  padding: 0 32rpx;
+}
+</style>
+<template>
+  <view class="wx-toast">
+    <slot></slot>
+  </view>
+</template>
+
+<script>
+import { Component } from '../libraries/tina.min.js'
+Component.define({
+  properties: {
+    content: String,
+  },
+})
+</script>

@@ -1,0 +1,124 @@
+<config>
+{
+  "pages": [
+    "pages/home/home",
+    "pages/product/product",
+    "pages/pay/pay",
+    "pages/callback/callback",
+    "pages/center/center",
+    "pages/order/list",
+    "pages/order/detail",
+    "pages/order/express",
+    "pages/address/list",
+    "pages/address/edit"
+  ],
+  "window": {
+    "enablePullDownRefresh": true,
+    "backgroundColor": "#f6f6f6"
+  }
+}
+</config>
+<style>
+@import './images/transfonter/stylesheet.css';
+@import './application.css';
+
+</style>
+<script>
+import CONSTANT from './constant'
+import { login, register, getUser } from './services/user'
+import { setAccount, calcClientInfo } from './utils/functions'
+import router from './libraries/tina-router.min.js'
+import { Page, Component } from './libraries/tina.min.js'
+import { getUserInfo } from './utils/promise'
+Page.mixin(router())
+Component.mixin(router())
+
+App({
+    onLaunch: function(options) {
+        console.log(options)
+        // 登录
+        try {
+            const userId = wx.getStorageSync(CONSTANT['COOKIE_USER_ID'])
+            const sessionKey = wx.getStorageSync(CONSTANT['COOKIE_USER_SESSIONKEY'])
+            console.log("userId---", userId)
+            console.log("userId---", sessionKey)
+            if (userId === "" || sessionKey === "") {
+                return this.login()
+            }
+            getUser().then(()=> {
+
+            }, e=> {
+                if(e.code === 1003 || e.code === 1013) {
+                    this.login()
+                }
+            })
+        } catch (e) {
+            console.log("eeee", e)
+            this.login()
+        }
+
+
+            // 获取用户信息
+        wx.getSetting({
+            success: res => {
+                console.log("555",res)
+                if (!res.authSetting['scope.userInfo']) {
+                    wx.authorize({
+                        scope: 'scope.userInfo',
+                        success() {
+                            // 用户已经同意小程序使用录音功能，后续调用 wx.startRecord 接口不会弹窗询问
+                            // wx.startRecord()
+                        }
+                    })
+                }
+            }
+        })
+    },
+    globalData: {
+        userInfo: null
+    },
+    login() {
+        wx.login({
+            success: res => {
+                // 发送 res.code 到后台换取 openId, sessionKey, unionId
+                console.log(res.code)
+                login(res.code).then(data => {
+                    console.log(data)
+                    setAccount(data)
+                }, e=> {
+                    console.log(e)
+                    if(e.code === 10010) {
+                        this.registerAccount(e.data)
+                    }
+                })
+                    //                 console.log("code---", res)
+                    //     // 发送 res.code 到后台换取 openId, sessionKey, unionId
+                // wx.getUserInfo({
+                //     withCredentials: true,
+                //     lang: "zh_CN",
+                //     success: function(res) {
+                //         console.log("6666666", res)
+                //     }
+                // })
+            }
+        })
+    },
+    registerAccount(res) {
+        console.log("account---", res)
+        const client = {
+            user: {
+                userId: ""
+            },
+            sessionKey: res.sessionKey,
+        }
+        const clientInfo = calcClientInfo(client)
+        getUserInfo().then(data=> {
+            console.log("user---", data)
+            register(data, clientInfo).then(account => {
+                setAccount(account)
+            })
+        })
+        
+    }
+})
+</script>

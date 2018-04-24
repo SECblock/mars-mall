@@ -1,0 +1,19 @@
+{
+  "pages":[
+    "pages/index/index",
+    "pages/logs/logs",
+    "pages/register/register",
+    "pages/validate/validate",
+    "pages/me/me",
+    "pages/record/record",
+    "pages/invite/invite",
+    "pages/agreement/agreement"
+  ],
+  "window":{
+    "backgroundColor": "transparent",
+    "backgroundTextStyle":"light",
+    "navigationBarBackgroundColor": "#4781c4",
+    "navigationBarTitleText": "WeChat",
+    "navigationBarTextStyle":"white"
+  }
+}

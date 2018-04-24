@@ -1,0 +1,24 @@
+<view class="record">
+  <view class="title">
+    <text class="diamond">信用钻</text>
+    <text class="score">{{score/10000 || 0}}</text>
+  </view>
+ 
+  <view class="detail">
+    <text class="detail-f">信用钻简介</text>
+    <text class="detail-s">信用钻是依托社交电商链(SEC)技术，基于个人在有信购物的分享产生的信用奖励，可以用于有信购物的消费和兑换等。</text>
+    <text class="detail-s">信用钻总量有限，全球15亿颗，而且每年产出量减少一半，随着时间推移获取难度越来越大，前期参与者更有优势。</text>
+  </view>
+  
+  <view class="bg">
+    <view class="list" wx:for="{{list}}" wx:key="{{index}}">
+     <view class="list-p">
+        <text class="list-type">{{item.type== 1 ? '签到':'邀请好友'}}</text> 
+        <text class="list-value" wx:if="{{item.type==1}}">+{{signType}}</text>
+        <text class="list-value" wx:else>+{{inviteType}}</text>
+      </view>
+      <view class="list-time">{{item.createTime}}</view>
+    </view>
+  </view>
+</view>
+

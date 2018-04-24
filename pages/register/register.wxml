@@ -1,0 +1,29 @@
+<!--pages/index/index.wxml-->
+<import src="../../components/toast/toast.wxml" />
+<template is="toast" data="{{..._toast_}}" ></template>
+<view class="register-view">
+  <image src='../../images/register-bg.png'></image>
+  <view class='title'>
+    <text class=''>信用钻</text>
+  </view>
+  <view class="info">
+    <view class="input phone {{isInputPhone?'in':''}}">
+      <input placeholder-class="placehold" type="number" placeholder="手机号" bindinput="phoneInput" confirm-type='next' auto-focus/>
+      <text class='send' bindtap="getCode">{{sendDesc}}</text>
+    </view>
+    <view class="input code {{isInputCode?'in':''}}">
+      <input placeholder-class="placehold" type="number" placeholder="验证码" bindinput="codeInput" confirm-type='done' value="{{sms}}"/>
+    </view>
+  </view>
+  <view class="checkboxRule">
+    <view class="checkbox-area">
+      <label class='checkbox'>
+        <checkbox-group bindchange="checkboxChange">
+          <checkbox value="UAS" checked="true" /><text>已阅读并同意</text>
+        </checkbox-group>
+      </label>
+    </view>
+    <text class='rule' bindtap='toRule'>《相关条款》</text>
+  </view>
+  <button class='button' bindtap="bindMobile" loading="{{binding}}"><text wx:if="{{!binding}}">注册</text></button>
+</view>

@@ -1,0 +1,92 @@
+/* pages/validate/validate.wxss */
+.register-view {
+  position: relative;
+  height: 100%;
+  background-size: 100%;
+}
+.register-view image {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  z-index: -1;
+}
+.title {
+  padding-top: 30rpx;
+  font-size: 55rpx;
+  font-weight: normal;
+  font-style: normal;
+  font-stretch: normal;
+  line-height: normal;
+  letter-spacing: normal;
+  text-align: center;
+  color: #bafdff;
+}
+.info {
+  width: 580rpx;
+  margin: 0 auto;
+  margin-top: 50rpx;
+}
+.info input {
+  color: #ffffff;
+  width: 100%;
+  height: 88rpx;
+  margin-bottom: 40rpx;
+  font-size: 34rpx;
+  border-bottom: 1rpx #5f7291 solid;
+}
+.info input.nameIn{
+  border-bottom: 1rpx #ffffff solid;
+}
+.info input.idCardIn{
+  border-bottom: 1rpx #ffffff solid;
+}
+.info input.codeIn{
+  border-bottom: 1rpx #ffffff solid;
+}
+.placehold {
+  color:  #5f7291;
+}
+.checkbox-area {
+  display: block;
+  width: 580rpx;
+  margin: 0 auto;
+  color: #ffffff;
+}
+.checkbox-area .checkbox {
+  color: #ff6d52;
+  font-size: 10rpx;
+}
+.checkbox-area .checkbox checkbox {
+  position: relative;
+  top: -6rpx;
+  
+}
+.checkbox-area .checkbox checkbox .wx-checkbox-input{
+  width: 24rpx;
+  height: 24rpx;
+  border: 1rpx #ffffff solid;
+  background: transparent;
+  border-radius: 1rpx;
+}
+.checkbox-area .checkbox checkbox .wx-checkbox-input.wx-checkbox-input-checked{
+  
+}
+.checkbox-area text {
+  font-size: 26rpx;
+  color: #ffffff;
+}
+.checkbox-area .rule{
+  color: #bafdff;
+}
+.button {
+  width: 580rpx;
+  height: 80rpx;
+  line-height: 80rpx;
+  margin: 0 auto;
+  margin-top: 60rpx;
+  text-align: center;
+  background-color: #4781c4;
+  color: #ffffff;
+  font-size: 34rpx;
+  border-radius: 4rpx;
+}

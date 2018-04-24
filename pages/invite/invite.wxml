@@ -1,0 +1,17 @@
+<view class="invite">
+  <view class="title">有信购物</view>
+  <view class="detail">基于区块链的信用社交商城</view>
+  <view class="center">
+    <view class="">
+      <view class="invitecode">邀请码</view>
+      <view class="code">{{inviteCode}}</view>
+      <view class="copy" bindtap="show">复制</view>
+      <view class="explain">
+      呼朋唤友一起挖钻。每成功邀请一位好友注册并实名后，你将获得5个信用钻的奖励。</view>
+      <view class="qrcode">
+        <image class="pic" src="../../images/code.jpeg"></image>
+      </view>
+      <text class="tips">扫码打开小程序，输入邀请码</text>
+    </view>
+  </view>
+</view>

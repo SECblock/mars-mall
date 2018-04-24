@@ -1,0 +1,33 @@
+<view class="user-center">
+  <image class="header_pic" src="../../images/me_header.png"></image>
+  <view class="userinfo">
+    <view wx:if="userInfo.avatarUrl"><image class="userinfo-avatar" src="{{userInfo.headIcon}}"></image></view>
+    <view wx:else><image class="userinfo-avatar" src="{{headPic}}"></image></view>
+    <text class="userinfo-nickname">{{userInfo.nickname}}</text>
+    <view class="content">
+      <view class="part" bindtap="sign">
+        <text wx:if="{{isSign}}" class="iconfont icon-qiandao font-common" style="opacity: 0.5"></text>
+        <text wx:else class="iconfont icon-qiandao font-common" style="opacity: 1"></text>
+        <text class="{{isSign ? 'signed' : 'sign'}}">{{isSign ? '已签到':'签到 +0.1'}}</text>
+      </view>
+      <view class="invite" bindtap="invite">
+        <text class="iconfont icon-yaoqinghaoyou font-common"></text>
+        <text class="invite-text">邀请好友 +5</text>
+      </view>
+    </view>
+  </view>
+  <view class="assets-card card" bindtap="assets">
+    <text class="iconfont icon-wodezichan font"></text>
+    <text class="text-common">我的资产</text>
+  </view>
+  <view class="menu">
+    <view class="menu-p" bindtap="jumpDiamond">
+      <text wx:if="{{!isCurrent}}" class="iconfont icon-moren1 menu-common"></text>
+      <text wx:else class="iconfont icon-jihuo1 menu-common"></text>
+    </view>
+    <view class="menu-p" bindtap="jumpMe">
+      <text wx:if="{{!isActive}}" class="iconfont icon-moren menu-common"></text>
+      <text wx:else class="iconfont .icon-jihuo menu-common"></text>
+    </view>
+  </view>
+</view>

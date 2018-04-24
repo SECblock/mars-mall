@@ -5,3 +5,5 @@ npm-debug.log
 .vscode
 # build
 /dist
+# config
+project.config.json

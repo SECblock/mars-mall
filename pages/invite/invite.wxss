@@ -1,0 +1,67 @@
+.invite {
+  width:100%;
+  height:100%;
+  position:absolute;
+  background:#4781c4;
+  text-align:center;
+}
+.title {
+  margin-top:26rpx;
+  margin-bottom:10rpx;
+  font-size:54rpx;
+  color:#bafdff;
+}
+.detail {
+  font-size:26rpx;
+  color:#fff;
+  margin-bottom:40rpx;
+}
+.center {
+  width:85%;
+  margin:auto;
+  height:968rpx;
+  background:#fff;
+  border-radius:16rpx;
+}
+.invitecode {
+  font-size:30rpx;
+  color:#4781c4;
+  padding-top:50rpx;
+  padding-bottom:4rpx;
+}
+.code {
+  font-size:54rpx;
+  color:#4781c4;
+  padding-bottom:40rpx;
+}
+.copy {
+  width:380rpx;
+  margin:auto;
+  height:80rpx;
+  background:#4781c4;
+  line-height:80rpx;
+  color:#fff;
+  border-radius:4rpx;
+  font-size:34rpx;
+}
+.explain {
+  padding-top:46rpx;
+  width:540rpx;
+  margin:auto;
+  font-size:24rpx;
+  color:#909fb0;
+  text-align:left;
+}
+.qrcode {
+  width:150px;
+  margin:auto;
+  padding-top:60rpx;
+}
+.pic {
+  width: 100%;
+  height: 150px;
+}
+.tips {
+  font-size:26rpx;
+  color:#4781c4;
+}

@@ -1,0 +1,15 @@
+<!--pages/index/index.wxml-->
+<import src="../../components/toast/toast.wxml" />
+<template is="toast" data="{{..._toast_}}" ></template>
+<view class="register-view">
+  <image src='../../images/register-bg.png'></image>
+  <view class='title'>
+    <text class=''>信用钻</text>
+  </view>
+  <view class="info">
+    <input class="{{isInputName?'nameIn':''}}" placeholder-class="placehold" type="text" placeholder="真实姓名" confirm-type='next' bindinput="nameInput" auto-focus/>
+    <input class="{{isInputIdCard?'idCardIn':''}}" placeholder-class="placehold" type="idcard" placeholder="身份证号" bindinput="idCardInput" confirm-type='next'/>
+    <input class="{{isInputCode?'codeIn':''}}" placeholder-class="placehold" type="text" placeholder="邀请码(选填)" bindinput="inviteInput" confirm-type='done' value="{{code}}" />
+  </view>
+  <button class='button' bindtap="fillMsg" loading="{{loading}}"><text wx:if="{{!loading}}">完成</text></button>
+</view>
